@@ -42,7 +42,7 @@ Comprehensive test suite for validating normalization logic.
 - Complex address combinations
 - Interactive testing for custom addresses
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Normalize CSV Files
 ```bash
@@ -68,7 +68,7 @@ normalized = normalizer.normalize_address("123 Canyon Lake Circle NE Apt 5")
 # Result: "123 Canyon Lake Cir NE Apt 5"
 ```
 
-## 📋 Normalization Rules
+## Normalization Rules
 
 ### Suffix Rules
 - **Only the LAST suffix is abbreviated**
@@ -88,7 +88,7 @@ normalized = normalizer.normalize_address("123 Canyon Lake Circle NE Apt 5")
 - **Commas**: Removed during processing
 - **Fractions**: Preserved (1/2, 1/3, etc.)
 
-## 🎯 Column Detection
+## Column Detection
 
 ### Automatic Detection
 The script automatically identifies address columns using:
@@ -116,7 +116,7 @@ df_normalized = normalize_specific_addresses(df, ['PRIMARY_ADDRESS', 'Address1']
 df_normalized = normalize_specific_addresses(df, 'PRIMARY_ADDRESS')
 ```
 
-## 📊 Output Format
+## Output Format
 
 Original columns remain unchanged. Normalized columns are added with `n_` prefix:
 
@@ -133,7 +133,7 @@ PRIMARY_ADDRESS              | n_PRIMARY_ADDRESS
 456 Oak Ave #5              | 456 Oak Ave Unit 5
 ```
 
-## 🔧 Requirements
+## Requirements
 
 ```python
 pandas
@@ -145,7 +145,7 @@ Install dependencies:
 pip install pandas chardet
 ```
 
-## 📝 Example Usage Scenarios
+## Example Usage Scenarios
 
 ### 1. Data Deduplication
 ```python
@@ -177,29 +177,13 @@ python normalize_addresses.py
 # Output: customer_data_proc.csv with normalized columns
 ```
 
-## ⚡ Performance Notes
+## Performance Notes
 
 - **Encoding Detection**: Automatically handles UTF-8, Latin-1, CP1252, ISO-8859-1
 - **Memory Efficient**: Processes data in chunks for large files
 - **Preserves Data**: Original columns remain unchanged
 
-## 🐛 Troubleshooting
-
-### Common Issues
-
-1. **No address columns detected**
-   - Check column names match detection patterns
-   - Use manual column specification
-
-2. **Encoding errors**
-   - Install `chardet`: `pip install chardet`
-   - Script includes fallback encoding detection
-
-3. **Unexpected normalizations**
-   - Use `test_address_logic.py` to validate specific addresses
-   - Check suffix/directional mappings in `AddressNormalizer`
-
-## 📚 Technical Details
+## Technical Details
 
 ### Address Processing Pipeline
 1. **Clean special characters** (`/n`, commas, etc.)
