@@ -132,7 +132,9 @@ class AddressNormalizer:
         unit_indices = []
 
         for i, word in enumerate(words):
-            if word.title() in self.street_suffix_mapping:
+            # Check if word is a suffix (either full form or abbreviation)
+            if (word.title() in self.street_suffix_mapping or 
+                word.title() in self.reverse_mapping):
                 primary_suffix_indices.append(i)
             if word.upper() in self.directional:
                 directional_indices.append(i)
@@ -151,46 +153,28 @@ class AddressNormalizer:
                 processed_words.append(word)
                 continue
 
-            # USPS rule: If two consecutive suffixes, spell out first, abbreviate second
-            if (
-                i in primary_suffix_indices
-                and i + 1 < len(words)
-                and (i + 1) in primary_suffix_indices
-            ):
-                # First of two suffixes -> spelled out (reverse_mapping if possible)
-                if word.title() in self.reverse_mapping:
-                    processed_words.append(self.reverse_mapping[word.title()])
+            # New simplified rule: Only the LAST suffix gets abbreviated, all others spelled out
+            if i in primary_suffix_indices:
+                # Find the last suffix index
+                last_suffix_index = max(primary_suffix_indices) if primary_suffix_indices else -1
+                
+                if i == last_suffix_index:
+                    # This is the last suffix - abbreviate it
+                    # If it's already abbreviated, keep it. If it's full form, abbreviate it.
+                    if word.title() in self.street_suffix_mapping:
+                        # Full form -> abbreviate
+                        processed_words.append(self.street_suffix_mapping[word.title()])
+                    else:
+                        # Already abbreviated -> keep as is
+                        processed_words.append(word)
                 else:
-                    processed_words.append(word.title())
-                continue
-
-            # If this is the second of two suffixes, abbreviate it
-            if (
-                i > 0
-                and (i - 1) in primary_suffix_indices
-                and i in primary_suffix_indices
-            ):
-                processed_words.append(
-                    self.street_suffix_mapping.get(word.title(), word)
-                )
-                continue
-
-            # If it's a stand-alone suffix at the end, abbreviate
-            if i in primary_suffix_indices and i == len(words) - 1:
-                processed_words.append(
-                    self.street_suffix_mapping.get(word.title(), word)
-                )
-                continue
-
-            # If suffix is followed by directional/unit, abbreviate
-            if (
-                i in primary_suffix_indices
-                and i + 1 < len(words)
-                and ((i + 1) in directional_indices or (i + 1) in unit_indices)
-            ):
-                processed_words.append(
-                    self.street_suffix_mapping.get(word.title(), word)
-                )
+                    # Not the last suffix - spell it out
+                    if word.title() in self.reverse_mapping:
+                        # Abbreviated -> spell out
+                        processed_words.append(self.reverse_mapping[word.title()])
+                    else:
+                        # Already spelled out -> keep as is
+                        processed_words.append(word.title())
                 continue
 
             processed_words.append(word)
